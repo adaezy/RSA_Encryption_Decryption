@@ -11,7 +11,7 @@ threading.stack_size(2**27)
 
 bits = 512
 
-def squareandmultiply(a, b,mod):
+def square_and_multiply(a, b,mod):
     exp = bin(b)
     val = a
 
@@ -21,57 +21,57 @@ def squareandmultiply(a, b,mod):
             val = (val * a)%mod
     return val % mod
 
-def ConvertToInt(message_str):
-    res = 0
-    for i in range(len(message_str)):
-        res = res * 128 + ord(message_str[i])
-    return res
+def convert_int(msg):
+    val = 0
+    for i in range(len(msg)):
+        val = val * 128 + ord(msg[i])
+    return val
 
-def ConvertToStr(n):
-    res = ""
+def convert_str(n):
+    val= ""
     while n > 0:
-        res += chr(n % 128)
+        val += chr(n % 128)
         n //= 128
-    return res[::-1]
+    return val[::-1]
 
 
-def ExtendedEuclid(a, b):
+def ext_euclid(a, b):
     if b == 0:
         return (1, 0)
-    (x, y) = ExtendedEuclid(b, a % b)
+    (x, y) = ext_euclid(b, a % b)
     k = a // b
     return (y, x - k * y)
 
-def InvertModulo(a, n):
-    (b, x) = ExtendedEuclid(a, n)
+def invert_modulo(a, n):
+    (b, x) = ext_euclid(a, n)
     if b < 0:
         b = (b % n + n) % n
     return b
 
-def ChineseRemainderTheorem(p, r1, q, r2):
+def chinese_remainder_theorem(p, r1, q, r2):
     #(x, y) = ExtendedEuclid(n1, n2)
-    q_inverse = InvertModulo(q, p)#have big integers
+    q_inverse = invert_modulo(q, p)#have big integers
     h = (q_inverse * (r1 - r2)) % p #have big integers
     m = r2 + (h * q) #have big integers
     return m
     #return ((r2 * x * n1 + r1 * y * n2) % (n1 * n2) + (n1 * n2)) % (n1 * n2)
 
 def Encrypt(message, modulo, exponent):
-    ciphertext = squareandmultiply(ConvertToInt(message), exponent, modulo)
+    ciphertext = square_and_multiply(convert_int(message), exponent, modulo)
     return ciphertext
 
 def Decrypt(ciphertext, p, q, exponent):
     p1 = p - 1 #have big integers
     q1 = q - 1 #have big integers
-    d = InvertModulo(exponent,p1*q1) #have big integers
+    d = invert_modulo(exponent,p1*q1) #have big integers
     dp = d % (p1)
     dq = d % (q1)
     #ciphertext_p = ciphertext % p
     #ciphertext_q = ciphertext % q
-    first_message = squareandmultiply(ciphertext,dp,p) #have big integers
-    second_message = squareandmultiply(ciphertext,dq,q) #have big integers
+    first_message = square_and_multiply(ciphertext,dp,p) #have big integers
+    second_message = square_and_multiply(ciphertext,dq,q) #have big integers
     #return ConvertToStr(squareandmultiply(ciphertext, d, p * q))
-    return ConvertToStr(ChineseRemainderTheorem(p,first_message,q,second_message)) #have big integers
+    return convert_str(chinese_remainder_theorem(p,first_message,q,second_message)) #have big integers
 
 def enter_input():
     val_input = input("Enter an input:")
